@@ -1,0 +1,687 @@
+/* =========================================================
+   STYLE.CSS - Basé sur votre CSS avec améliorations
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #ddd;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ========== HEADER + NAVIGATION ========== */
+
+header {
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-container {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+}
+
+.site-title {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+/* Bouton menu hamburger (caché par défaut) */
+.menu-toggle {
+    display: none;
+    background: #7f7e7e;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+nav {
+    background-color: #7f7e7e;
+    border-radius: 8px;
+}
+
+nav ul {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav li {
+    flex: 1;
+    text-align: center;
+}
+
+nav a {
+    display: block;
+    padding: 15px 0;
+    text-decoration: none;
+    color: white;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+nav a:hover,
+nav a.active {
+    border-bottom: 2px solid gold;
+    color: orange;
+}
+
+nav a.active {
+    font-weight: bold;
+}
+
+/* Bouton déconnexion dans le menu */
+.btn-deconnexion {
+    background-color: #ef1206;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+
+.btn-deconnexion:hover {
+    background-color: #c00;
+    border-bottom: none !important;
+}
+
+/* ========== MAIN CONTENT ========== */
+
+main {
+    flex: 1;
+    width: 90%;
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+}
+
+main section {
+    width: 100%;
+}
+
+/* ========== TITRES ========== */
+
+h2 {
+    text-align: center;
+    color: #e70909;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+h3 {
+    color: #333;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+p {
+    line-height: 1.6;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* ========== FORMULAIRES ========== */
+
+form {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;
+    border-radius: 5px;
+    background-color: #ccc;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+form h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+form label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+form input,
+form textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    font-family: inherit;
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+#sub, #reset {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+#sub {
+    background-color: #4CAF50;
+}
+
+#sub:hover {
+    background-color: #45a049;
+}
+
+#reset {
+    background-color: #ef1206;
+}
+
+#reset:hover {
+    background-color: #c00;
+}
+
+/* Champs avec erreur */
+input.erreur-champ,
+textarea.erreur-champ {
+    border: 2px solid red;
+    background-color: #ffe6e6;
+}
+
+/* ========== MESSAGES ========== */
+
+.erreur {
+    color: #d00;
+    font-size: 14px;
+    margin-top: 3px;
+}
+
+p.erreur {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 2px;
+    margin-bottom: 10px;
+}
+
+.success {
+    color: green;
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* ========== BIBLIOTHÈQUE ========== */
+
+.ajout-livre-form {
+    margin-bottom: 40px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-col {
+    width: 100%;
+}
+
+.livres-liste h3 {
+    text-align: center;
+    color: #333;
+}
+
+.no-books {
+    text-align: center;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 8px;
+    color: #666;
+}
+
+.livres-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.livre-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.livre-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.livre-card h4 {
+    color: #e70909;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.livre-card .auteur {
+    font-style: italic;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.livre-card .description {
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.livre-card .date-ajout {
+    font-size: 0.85em;
+    color: #999;
+    margin-bottom: 15px;
+}
+
+.form-supprimer {
+    padding: 0;
+    margin: 0;
+    background: none;
+    box-shadow: none;
+}
+
+.btn-supprimer {
+    background-color: #ef1206;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-supprimer:hover {
+    background-color: #c00;
+}
+
+/* ========== FOOTER ========== */
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #463e3e;
+    color: white;
+    margin-top: auto;
+}
+
+.footer-content {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+footer p {
+    color: white;
+    margin: 5px 0;
+}
+
+/* ========== RESPONSIVE MOBILE ========== */
+
+@media (max-width: 768px) {
+    
+    /* Afficher le bouton hamburger */
+    .menu-toggle {
+        display: block;
+    }
+    
+    /* Cacher le menu par défaut */
+    nav {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: #7f7e7e;
+        border-radius: 0 0 8px 8px;
+        display: none;
+    }
+    
+    /* Afficher le menu quand actif */
+    nav.active {
+        display: block;
+    }
+    
+    nav ul {
+        flex-direction: column;
+    }
+    
+    nav li {
+        width: 100%;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    nav a {
+        padding: 15px 20px;
+    }
+    
+    /* Formulaires plus compacts sur mobile */
+    form {
+        padding: 20px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .livres-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .buttons {
+        flex-direction: column;
+    }
+    
+    #sub, #reset {
+        width: 100%;
+    }
+    
+    main {
+        width: 95%;
+        padding: 15px;
+    }
+}
+
+/* ========== RESPONSIVE TABLET ========== */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .livres-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+/* =========================================================
+   CSS BOUTON RETOUR EN HAUT
+   À AJOUTER à votre asset/style.css
+   ========================================================= */
+
+/* Bouton retour en haut */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    
+    /* Caché par défaut */
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.8);
+    
+    /* Transition fluide */
+    transition: all 0.3s ease;
+}
+
+/* Bouton visible */
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+/* Effet au survol */
+.back-to-top:hover {
+    background-color: #45a049;
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Effet au clic */
+.back-to-top:active {
+    transform: scale(0.95);
+}
+
+/* Animation d'apparition */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.back-to-top.visible {
+    animation: slideInUp 0.4s ease;
+    border-radius: 8px;
+    width: 60px;
+    height: 60px;
+}
+
+/* Responsive mobile */
+@media (max-width: 768px) {
+    .back-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+}
+
+/* === AFFICHAGE DES NOTES === */
+
+.note-display {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.note-display .star {
+    font-size: 1.2rem;
+    margin: 0 2px;
+}
+
+.note-display .star.filled {
+    color: #ffc107;
+    text-shadow: 0 0 3px rgba(255, 193, 7, 0.5);
+}
+
+.note-display .star.empty {
+    color: #ddd;
+}
+
+/* === COMMENTAIRE PERSONNEL === */
+
+.commentaire-personnel {
+    background-color: #fff9e6;
+    border-left: 3px solid #ffc107;
+    padding: 10px;
+    margin: 15px 0;
+    border-radius: 5px;
+}
+
+.commentaire-personnel strong {
+    color: #f90;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.commentaire-personnel p {
+    margin: 0;
+    color: #555;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+/* === BOUTONS D'ACTION === */
+
+.actions-livre {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-noter {
+    background-color: #ffc107;
+    color: #333;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.btn-noter:hover {
+    background-color: #ffb300;
+    transform: translateY(-2px);
+}
+
+/* === FORMULAIRE DE NOTATION === */
+
+.form-notation {
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.note-selector {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.star-label {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.star-input {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: #f0f0f0;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.star-label:hover .star-input {
+    background-color: #fff9e6;
+    border-color: #ffc107;
+    transform: scale(1.1);
+}
+
+.star-label input:checked + .star-input {
+    background-color: #ffc107;
+    border-color: #f90;
+    color: white;
+    font-weight: bold;
+}
+
+.btn-valider {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.btn-valider:hover {
+    background-color: #45a049;
+}
+
+.btn-annuler {
+    background-color: #999;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.btn-annuler:hover {
+    background-color: #777;
+}
+
+/* === RESPONSIVE === */
+
+@media (max-width: 768px) {
+    .actions-livre {
+        flex-direction: column;
+    }
+    
+    .note-selector {
+        flex-direction: column;
+    }
+    
+    .star-input {
+        width: 100%;
+        text-align: center;
+    }
+}
