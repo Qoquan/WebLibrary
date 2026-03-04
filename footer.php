@@ -1,7 +1,7 @@
 <footer>
     <div class="footer-content">
-        <p>&copy; <?= date('Y') ?> - Mon site web. Tous droits réservés.</p>
-        <p>Projet PHP/MySQL - Architecture MVC</p>
+        <p>&copy; <?= date('Y') ?> - Loïc Boulanger. Tous droits réservés.</p>
+        <p>Projet PHP/MySQL JS- Architecture MVC</p>
     </div>
 </footer>
 

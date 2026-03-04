@@ -107,46 +107,13 @@ DESCRIBE t_utilisateur_uti;
 DESCRIBE t_livre_liv;
 DESCRIBE t_contact_con;
 
--- =========================================================
--- DONNÉES DE TEST (Optionnel - Décommenter si besoin)
--- =========================================================
+ALTER TABLE t_utilisateur_uti 
+ADD COLUMN uti_remember_token VARCHAR(64) DEFAULT NULL COMMENT 'Token cookie',
+ADD COLUMN uti_remember_expiration DATETIME DEFAULT NULL COMMENT 'Date expiration';
 
-/*
--- Utilisateur de test (mot de passe : test123)
-INSERT INTO t_utilisateur_uti (uti_prenom, uti_nom, uti_pseudo, uti_email, uti_motdepasse)
-VALUES ('Jean', 'Dupont', 'jeandupont', 'jean@test.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi');
-
--- Livre de test
-INSERT INTO t_livre_liv (liv_titre, liv_auteur, liv_description, liv_utilisateur_id, liv_note_personnelle, liv_commentaire_personnel)
-VALUES ('Le Petit Prince', 'Antoine de Saint-Exupéry', 'Un conte poétique et philosophique', 1, 5, 'Un chef-d\'œuvre absolu !');
-
--- Contact de test
-INSERT INTO t_contact_con (con_prenom, con_nom, con_pseudo, con_email, con_message)
-VALUES ('Marie', 'Martin', 'marie123', 'marie@test.com', 'Bonjour, ceci est un message de test.');
-*/
-
--- =========================================================
--- REQUÊTES UTILES POUR LA MAINTENANCE
--- =========================================================
-
--- Compter les utilisateurs
--- SELECT COUNT(*) as nb_utilisateurs FROM t_utilisateur_uti;
-
--- Compter les livres
--- SELECT COUNT(*) as nb_livres FROM t_livre_liv;
-
--- Compter les contacts
--- SELECT COUNT(*) as nb_contacts FROM t_contact_con;
-
--- Voir les livres avec notes
--- SELECT liv_titre, liv_auteur, liv_note_personnelle FROM t_livre_liv WHERE liv_note_personnelle IS NOT NULL;
-
--- Moyenne des notes
--- SELECT AVG(liv_note_personnelle) as note_moyenne FROM t_livre_liv WHERE liv_note_personnelle IS NOT NULL;
-
--- =========================================================
--- FIN DU SCRIPT SQL
--- =========================================================
+-- Index pour performances
+ALTER TABLE t_utilisateur_uti
+ADD INDEX idx_remember_token (uti_remember_token);
 
 -- Messages de confirmation
 SELECT 'Base de données créée avec succès !' as message;

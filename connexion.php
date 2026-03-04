@@ -2,24 +2,7 @@
 $pageTitle = "Connexion";
 require_once __DIR__ . '/controleur/connexion_controleur.php';
 require_once __DIR__ . '/header.php';
-
-
-
-// Créer un cookie durable
-function definir_cookie($nom, $valeur, $duree = 31536000) {
-    setcookie($nom, $valeur, time() + $duree, "/", "", false, true);
-}
-
-// Lire un cookie
-function lire_cookie($nom) {
-    return $_COOKIE[$nom] ?? null;
-}
-
-// Supprimer un cookie
-function supprimer_cookie($nom) {
-    setcookie($nom, "", time() - 3600, "/");
-}?>
-<link rel="stylesheet" href="asset/style.css">
+?>
 
 <main class="connexion-page">
     <section class="connexion-section">
@@ -45,6 +28,20 @@ function supprimer_cookie($nom) {
                 required
             >
             <p class="erreur"><?= $erreurs['motDePasse'] ?? '' ?></p>
+
+            <!-- Checkbox "Se souvenir de moi" -->
+            <div style="margin: 15px 0;">
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer;">
+                    <input 
+                        type="checkbox" 
+                        name="se_souvenir" 
+                        id="se_souvenir"
+                        value="1"
+                        style="width: auto; margin: 0; cursor: pointer;"
+                    >
+                    <span>🍪 Se souvenir de moi pendant 1 semaine</span>
+                </label>
+            </div>
 
             <div class="buttons">
                 <input id="sub" type="submit" value="Connexion">

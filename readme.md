@@ -15,9 +15,10 @@
 4. [Fonctionnalités](#fonctionnalités)
 5. [Architecture MVC](#architecture-mvc)
 6. [Sécurité](#sécurité)
-7. [Installation](#installation)
-8. [Utilisation](#utilisation)
-9. [Code source complet](#code-source-complet)
+7. [Système de cookies](#système-de-cookies)
+8. [Installation](#installation)
+9. [Utilisation](#utilisation)
+10. [Code source complet](#code-source-complet)
 
 ---
 
@@ -27,6 +28,7 @@
 
 Application web de gestion de bibliothèque personnelle permettant aux utilisateurs de :
 - Créer un compte et se connecter
+- **Rester connecté pendant 1 semaine (cookies sécurisés)** 🆕
 - Rechercher des livres via l'API Google Books
 - Ajouter des livres manuellement ou depuis l'API
 - Noter et commenter leurs livres (0 à 5 étoiles)
@@ -40,6 +42,7 @@ Application web de gestion de bibliothèque personnelle permettant aux utilisate
 - **Frontend** : HTML5, CSS3, JavaScript (ES6+)
 - **Serveur** : Apache (Laragon)
 - **API externe** : Google Books API
+- **Persistance** : Sessions PHP + Cookies sécurisés (HttpOnly)
 
 ---
 
@@ -50,12 +53,12 @@ webdynamique/
 │
 ├── index.php                    # Page d'accueil
 ├── contact.php                  # Formulaire de contact
-├── connexion.php                # Page de connexion
+├── connexion.php                # Page de connexion (avec cookies)
 ├── inscription.php              # Page d'inscription
 ├── profil.php                   # Profil utilisateur
 ├── bibliotheque.php             # Gestion de la bibliothèque
 ├── recherche.php                # Recherche API Google Books
-├── deconnexion.php              # Déconnexion
+├── deconnexion.php              # Déconnexion (supprime cookies)
 ├── header.php                   # En-tête (menu)
 ├── footer.php                   # Pied de page
 │
@@ -64,12 +67,12 @@ webdynamique/
 │
 ├── controleur/
 │   ├── contact_controler.php              # Logique formulaire contact
-│   ├── connexion_controleur.php           # Logique connexion
+│   ├── connexion_controleur.php           # Logique connexion + cookies
 │   ├── inscription_controleur.php         # Logique inscription
 │   ├── profil_controleur.php              # Logique profil
 │   ├── bibliotheque_controleur.php        # Logique bibliothèque
 │   ├── recherche_controleur.php           # Logique recherche API
-│   └── gestionAuthentification.php        # Gestion sessions
+│   └── gestionAuthentification.php        # Gestion sessions + cookies
 │
 └── asset/
     ├── style.css                # Styles CSS
@@ -105,10 +108,13 @@ DATABASE: bdd_projet_web
 | uti_compte_active | TINYINT(1) | Compte actif (1) ou non (0) |
 | uti_code_activation | VARCHAR(5) | Code d'activation (optionnel) |
 | uti_date_inscription | TIMESTAMP | Date d'inscription |
+| **uti_remember_token** 🆕 | VARCHAR(64) | Token pour cookie "se souvenir" |
+| **uti_remember_expiration** 🆕 | DATETIME | Date d'expiration du token |
 
 **Index :**
 - `idx_pseudo` sur `uti_pseudo`
 - `idx_email` sur `uti_email`
+- `idx_remember_token` sur `uti_remember_token` 🆕
 
 ---
 
@@ -173,7 +179,14 @@ DATABASE: bdd_projet_web
 - Authentification par pseudo + mot de passe
 - Vérification avec `password_verify()`
 - Création de session sécurisée
-- Cookie pour mémoriser le dernier pseudo
+- **Option "Se souvenir de moi" (cookies 7 jours)** 🆕
+
+#### Connexion automatique via cookies 🆕
+- Token unique généré avec `random_bytes(32)`
+- Stockage sécurisé en base de données
+- Cookie HttpOnly (protection XSS)
+- Vérification expiration à chaque visite
+- Suppression automatique à la déconnexion
 
 #### Profil
 - Affichage des informations utilisateur
@@ -215,6 +228,7 @@ DATABASE: bdd_projet_web
 - Commentaire personnel libre
 - Modification à tout moment
 - Affichage visuel des étoiles
+- Fonctionne sur TOUS les livres (manuels et API)
 
 #### Gestion
 - Affichage en grille responsive
@@ -304,6 +318,7 @@ DATABASE: bdd_projet_web
 - Traitement des formulaires
 - Interaction base de données
 - Gestion des sessions
+- **Gestion des cookies de persistance** 🆕
 - Préparation des données pour les vues
 
 ---
@@ -345,6 +360,9 @@ password_verify($password, $hash);
 // Démarrage sécurisé
 session_start();
 
+// Régénération de l'ID après connexion
+session_regenerate_id(true);
+
 // Stockage ID utilisateur uniquement
 $_SESSION['utilisateurId'] = $id;
 
@@ -358,6 +376,242 @@ session_destroy();
 - Longueur : `mb_strlen()`, min/max
 - Format : `filter_var($email, FILTER_VALIDATE_EMAIL)`
 - Valeurs autorisées : plages (0-5 pour notes)
+
+---
+
+## 🍪 SYSTÈME DE COOKIES
+
+### Fonctionnalité "Se souvenir de moi"
+
+#### Description
+
+Permet à l'utilisateur de rester connecté pendant **7 jours** sans avoir à se reconnecter à chaque visite.
+
+#### Composants
+
+**1. Checkbox dans le formulaire de connexion**
+
+```html
+<label>
+    <input type="checkbox" name="se_souvenir" value="1">
+    🍪 Se souvenir de moi pendant 1 semaine
+</label>
+```
+
+**2. Token sécurisé**
+
+```php
+// Génération d'un token cryptographiquement sûr
+$token = bin2hex(random_bytes(32)); // 64 caractères hex
+
+// Exemple : "a7f3c2b8e9d1f4a6c5b8d9e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2"
+```
+
+**3. Stockage en base de données**
+
+```sql
+-- Token et expiration stockés dans t_utilisateur_uti
+uti_remember_token        VARCHAR(64)
+uti_remember_expiration   DATETIME
+
+-- Exemple :
+Token: "a7f3c2b8e9d1f4a6..."
+Expiration: "2026-03-18 14:30:00" (7 jours après connexion)
+```
+
+**4. Cookie sécurisé**
+
+```php
+setcookie(
+    'remember_token',                // Nom du cookie
+    $token,                          // Valeur (le token)
+    time() + (7 * 24 * 60 * 60),    // Expiration (7 jours)
+    '/',                             // Path (tout le site)
+    '',                              // Domain (domaine actuel)
+    false,                           // Secure (true si HTTPS)
+    true                             // HttpOnly (protection XSS)
+);
+```
+
+---
+
+### Processus de connexion avec cookie
+
+#### Étape 1 : Connexion initiale
+
+```
+1. Utilisateur coche "Se souvenir de moi"
+2. Identifiants validés
+3. Token unique généré (64 caractères)
+4. Token sauvegardé en BDD avec date d'expiration
+5. Cookie créé dans le navigateur (7 jours)
+6. Session créée normalement
+7. Redirection vers le profil
+```
+
+#### Étape 2 : Visite ultérieure
+
+```
+1. Utilisateur visite le site
+2. Vérification de la session (vide si navigateur fermé)
+3. Détection du cookie "remember_token"
+4. Récupération du token depuis le cookie
+5. Vérification en BDD :
+   - Token existe ?
+   - Date d'expiration > NOW() ?
+6. Si valide :
+   ✅ Connexion automatique
+   ✅ Session recréée
+   ✅ Redirection vers le profil
+7. Si invalide :
+   ❌ Cookie supprimé
+   ❌ Utilisateur reste déconnecté
+```
+
+#### Étape 3 : Déconnexion manuelle
+
+```
+1. Utilisateur clique "Déconnexion"
+2. Token supprimé de la BDD (SET NULL)
+3. Cookie supprimé du navigateur
+4. Session détruite
+5. Redirection vers l'accueil
+```
+
+---
+
+### Sécurité des cookies
+
+#### Mesures de protection
+
+**1. Token aléatoire cryptographiquement sûr**
+
+```php
+// Utilisation de random_bytes() (pas mt_rand() ou uniqid())
+$token = bin2hex(random_bytes(32));
+
+// Impossible à deviner ou bruteforcer
+// 2^256 possibilités
+```
+
+**2. HttpOnly**
+
+```php
+setcookie(..., true); // Dernier paramètre
+
+// Protection :
+// - JavaScript ne peut pas lire le cookie
+// - Protection contre vol XSS
+```
+
+**3. Expiration double (BDD + Cookie)**
+
+```php
+// BDD : vérification serveur
+WHERE uti_remember_expiration > NOW()
+
+// Cookie : vérification navigateur
+time() + (7 * 24 * 60 * 60)
+
+// Si une des deux expire → déconnexion
+```
+
+**4. Suppression à la déconnexion**
+
+```php
+// Token supprimé en BDD
+UPDATE t_utilisateur_uti 
+SET uti_remember_token = NULL, 
+    uti_remember_expiration = NULL
+
+// Cookie supprimé
+setcookie('remember_token', '', time() - 3600);
+```
+
+**5. Pas de stockage du mot de passe**
+
+```
+❌ Cookie ne contient PAS le mot de passe
+✅ Cookie contient un token unique
+✅ Token inutilisable sans la BDD
+```
+
+---
+
+### Configuration et personnalisation
+
+#### Modifier la durée (14 jours au lieu de 7)
+
+**Dans `connexion_controleur.php` :**
+
+```php
+// AVANT (7 jours)
+$expiration = date('Y-m-d H:i:s', time() + (7 * 24 * 60 * 60));
+setcookie('remember_token', $token, time() + (7 * 24 * 60 * 60), ...);
+
+// APRÈS (14 jours)
+$expiration = date('Y-m-d H:i:s', time() + (14 * 24 * 60 * 60));
+setcookie('remember_token', $token, time() + (14 * 24 * 60 * 60), ...);
+```
+
+**Dans `connexion.php` :**
+
+```html
+<span>🍪 Se souvenir de moi pendant 2 semaines</span>
+```
+
+#### Activer HTTPS (Production)
+
+**Dans `connexion_controleur.php` :**
+
+```php
+setcookie(
+    'remember_token',
+    $token,
+    time() + (7 * 24 * 60 * 60),
+    '/',
+    '',
+    true,  // ← Secure = true (cookie envoyé uniquement en HTTPS)
+    true
+);
+```
+
+---
+
+### Vérification et débogage
+
+#### Voir le cookie dans le navigateur
+
+```
+1. F12 (Outils développeur)
+2. Application → Cookies
+3. http://localhost
+4. Chercher "remember_token"
+```
+
+#### Vérifier le token en BDD
+
+```sql
+SELECT 
+    uti_pseudo,
+    uti_remember_token,
+    uti_remember_expiration,
+    CASE 
+        WHEN uti_remember_expiration > NOW() THEN 'Valide'
+        ELSE 'Expiré'
+    END as statut
+FROM t_utilisateur_uti
+WHERE uti_remember_token IS NOT NULL;
+```
+
+#### Supprimer tous les tokens expirés
+
+```sql
+UPDATE t_utilisateur_uti 
+SET uti_remember_token = NULL, 
+    uti_remember_expiration = NULL
+WHERE uti_remember_expiration < NOW();
+```
 
 ---
 
@@ -420,7 +674,8 @@ function obtenirConfigBdd(): array {
 - ✅ Menu fonctionne
 - ✅ Inscription possible
 - ✅ Connexion fonctionne
-- ✅ Recherche API accessible
+- ✅ Option "Se souvenir de moi" présente 🆕
+- ✅ Cookie fonctionne 🆕
 
 ---
 
@@ -437,11 +692,23 @@ function obtenirConfigBdd(): array {
 ```
 
 #### 2. Se connecter
+
+**Sans cookie (connexion normale) :**
 ```
 1. Cliquer "Connexion"
 2. Entrer pseudo + mot de passe
-3. Valider
-4. Redirection vers le profil
+3. NE PAS cocher "Se souvenir de moi"
+4. Valider
+5. Connecté jusqu'à fermeture du navigateur
+```
+
+**Avec cookie (rester connecté 7 jours) :** 🆕
+```
+1. Cliquer "Connexion"
+2. Entrer pseudo + mot de passe
+3. ✅ COCHER "Se souvenir de moi pendant 1 semaine"
+4. Valider
+5. Connecté pendant 7 jours (même après fermeture navigateur)
 ```
 
 #### 3. Rechercher un livre
@@ -468,6 +735,16 @@ function obtenirConfigBdd(): array {
 Ajouter manuellement : Formulaire en haut de page
 Modifier note : Cliquer "⭐ Noter / Commenter"
 Supprimer : Cliquer "🗑️"
+```
+
+#### 6. Se déconnecter
+```
+Menu → "Déconnexion"
+
+Effet :
+- Session détruite
+- Cookie supprimé (si "Se souvenir de moi" était activé)
+- Redirection vers l'accueil
 ```
 
 ---
@@ -500,6 +777,17 @@ Supprimer : Cliquer "🗑️"
    <script src="asset/js/nouvelle_feature.js"></script>
    ```
 
+#### Modifier la durée des cookies
+
+**Fichier** : `controleur/connexion_controleur.php`
+
+**Ligne ~75 :**
+```php
+// Pour 30 jours au lieu de 7
+$expiration = date('Y-m-d H:i:s', time() + (30 * 24 * 60 * 60));
+setcookie('remember_token', $token, time() + (30 * 24 * 60 * 60), ...);
+```
+
 ---
 
 ## 📝 CODE SOURCE COMPLET
@@ -508,7 +796,7 @@ Supprimer : Cliquer "🗑️"
 
 ```sql
 -- =========================================================
--- BASE DE DONNÉES COMPLÈTE
+-- BASE DE DONNÉES COMPLÈTE AVEC COOKIES
 -- =========================================================
 
 CREATE DATABASE IF NOT EXISTS bdd_projet_web 
@@ -522,7 +810,7 @@ DROP TABLE IF EXISTS t_contact_con;
 DROP TABLE IF EXISTS t_utilisateur_uti;
 
 -- =========================================================
--- TABLE UTILISATEURS
+-- TABLE UTILISATEURS (avec cookies)
 -- =========================================================
 
 CREATE TABLE t_utilisateur_uti (
@@ -536,8 +824,13 @@ CREATE TABLE t_utilisateur_uti (
     uti_code_activation VARCHAR(5) NULL,
     uti_date_inscription TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
+    -- Colonnes pour cookies "Se souvenir de moi"
+    uti_remember_token VARCHAR(64) DEFAULT NULL COMMENT 'Token pour cookie',
+    uti_remember_expiration DATETIME DEFAULT NULL COMMENT 'Date expiration token',
+    
     INDEX idx_pseudo (uti_pseudo),
-    INDEX idx_email (uti_email)
+    INDEX idx_email (uti_email),
+    INDEX idx_remember_token (uti_remember_token)
     
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -630,7 +923,8 @@ function obtenirConfigBdd(): array {
 
 ```php
 <?php
-// Démarrer la session
+// Gestion sessions et cookies
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -638,6 +932,7 @@ if (session_status() === PHP_SESSION_NONE) {
 // Connecter un utilisateur
 function connecter_utilisateur($idUtilisateur) {
     $_SESSION['utilisateurId'] = $idUtilisateur;
+    session_regenerate_id(true); // Sécurité
 }
 
 // Vérifier si connecté
@@ -650,12 +945,46 @@ function utilisateur_id() {
     return $_SESSION['utilisateurId'] ?? null;
 }
 
-// Déconnexion
+// Déconnexion (avec suppression cookies)
 function deconnecter_utilisateur() {
+    
+    // Supprimer le cookie "Se souvenir de moi"
+    if (isset($_COOKIE['remember_token'])) {
+        
+        try {
+            require_once __DIR__ . '/../config/config.php';
+            
+            $dbConf = obtenirConfigBdd();
+            $pdo = new PDO(
+                "mysql:host={$dbConf['serveur']};dbname={$dbConf['bdd']};charset=utf8mb4",
+                $dbConf['utilisateur'],
+                $dbConf['mdp'],
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+            );
+            
+            // Supprimer token de la BDD
+            $stmt = $pdo->prepare("
+                UPDATE t_utilisateur_uti 
+                SET uti_remember_token = NULL, 
+                    uti_remember_expiration = NULL
+                WHERE uti_id = ?
+            ");
+            $stmt->execute([utilisateur_id()]);
+            
+        } catch (Exception $e) {
+            // Erreur silencieuse
+        }
+        
+        // Supprimer cookie du navigateur
+        setcookie('remember_token', '', time() - 3600, '/', '', false, true);
+    }
+    
+    // Détruire session
     if (session_status() !== PHP_SESSION_NONE) {
         session_unset();
         session_destroy();
     }
+    
     session_start();
 }
 ```
@@ -736,6 +1065,7 @@ function deconnecter_utilisateur() {
 <?php
 require_once __DIR__ . '/controleur/gestionAuthentification.php';
 
+// Déconnexion (supprime session ET cookies)
 deconnecter_utilisateur();
 
 header("Location: index.php");
@@ -756,19 +1086,20 @@ exit();
 
 ### Lignes de code (approximatif)
 
-- **PHP** : ~2000 lignes
+- **PHP** : ~2200 lignes (+200 pour cookies)
 - **JavaScript** : ~200 lignes
-- **CSS** : ~800 lignes
-- **SQL** : ~100 lignes
-- **Total** : ~3100 lignes
+- **CSS** : ~900 lignes (+100 pour bouton retour)
+- **SQL** : ~120 lignes (+20 pour cookies)
+- **Total** : ~3400 lignes
 
 ### Fonctionnalités
 
-- **14 fonctionnalités majeures**
+- **15 fonctionnalités majeures** (+1 pour cookies)
 - **3 tables de base de données**
 - **7 pages utilisateur**
 - **6 contrôleurs**
 - **1 API externe intégrée**
+- **Système de cookies sécurisés** 🆕
 
 ---
 
@@ -784,6 +1115,8 @@ exit();
 ✅ Protection SQL injection (PDO)  
 ✅ Hash des mots de passe (bcrypt)  
 ✅ Validation serveur complète  
+✅ **Cookies HttpOnly sécurisés** 🆕  
+✅ **Tokens cryptographiquement sûrs** 🆕  
 
 ### UX/UI
 ✅ Interface responsive (mobile, tablet, desktop)  
@@ -791,6 +1124,7 @@ exit();
 ✅ Animations fluides  
 ✅ Messages de feedback clairs  
 ✅ Design moderne et professionnel  
+✅ **Option "Se souvenir de moi"** 🆕  
 
 ### Fonctionnel
 ✅ CRUD complet sur les livres  
@@ -798,6 +1132,7 @@ exit();
 ✅ Système de notation avancé  
 ✅ Recherche performante  
 ✅ Gestion utilisateurs complète  
+✅ **Connexion persistante (7 jours)** 🆕  
 
 ---
 
@@ -808,18 +1143,21 @@ exit();
 - [ ] Tri/filtres avancés (note, auteur, date)
 - [ ] Export PDF de la bibliothèque
 - [ ] Recherche interne (dans sa bibliothèque)
+- [ ] **Gestion multi-appareils (voir sessions actives)** 🆕
 
 ### Moyen terme
 - [ ] Ajout de clé API Google Books (limite augmentée)
 - [ ] Statistiques détaillées (livres lus, notes moyennes)
 - [ ] Catégories/tags personnalisés
 - [ ] Partage de livres entre utilisateurs
+- [ ] **Historique des connexions** 🆕
 
 ### Long terme
 - [ ] Recommandations basées sur les notes
 - [ ] Intégration d'autres APIs (Goodreads, OpenLibrary)
 - [ ] Application mobile (PWA)
 - [ ] Mode hors ligne
+- [ ] **Authentification à deux facteurs (2FA)** 🆕
 
 ---
 
@@ -831,10 +1169,28 @@ exit();
 - **Documentation MySQL** : https://dev.mysql.com/doc/
 - **API Google Books** : https://developers.google.com/books
 - **Laragon** : https://laragon.org/docs/
+- **Sécurité cookies** : https://owasp.org/www-community/HttpOnly
 
-### Contact
+### Tests cookies
 
-Pour toute question sur ce projet, référez-vous à cette documentation complète.
+#### Vérifier le cookie
+```
+F12 → Application → Cookies → remember_token
+```
+
+#### Vérifier le token en BDD
+```sql
+SELECT uti_pseudo, uti_remember_token, uti_remember_expiration 
+FROM t_utilisateur_uti 
+WHERE uti_remember_token IS NOT NULL;
+```
+
+#### Nettoyer les tokens expirés
+```sql
+UPDATE t_utilisateur_uti 
+SET uti_remember_token = NULL, uti_remember_expiration = NULL
+WHERE uti_remember_expiration < NOW();
+```
 
 ---
 
@@ -844,6 +1200,46 @@ Projet éducatif - Mars 2026
 
 ---
 
-**FIN DE LA DOCUMENTATION**
+## 🎉 RÉSUMÉ FINAL
 
-*Ce projet démontre la maîtrise de PHP, MySQL, JavaScript, l'architecture MVC, la sécurité web et l'intégration d'API REST.*
+### Votre projet possède :
+
+**Fonctionnalités de base :**
+1. ✅ Inscription/connexion sécurisée
+2. ✅ **Connexion persistante avec cookies (7 jours)** 🆕
+3. ✅ Formulaire de contact en BDD
+4. ✅ Recherche API Google Books
+5. ✅ Import automatique de livres
+6. ✅ Ajout manuel de livres
+7. ✅ Notation et commentaires (0-5 étoiles)
+8. ✅ Gestion complète de bibliothèque
+9. ✅ Menu responsive
+10. ✅ Bouton retour en haut
+
+**Sécurité avancée :**
+- ✅ XSS, SQL Injection, CSRF
+- ✅ Hash bcrypt
+- ✅ Sessions sécurisées
+- ✅ **Cookies HttpOnly** 🆕
+- ✅ **Tokens cryptographiques** 🆕
+
+**Architecture professionnelle :**
+- ✅ MVC propre
+- ✅ Code commenté
+- ✅ 3400 lignes
+- ✅ 22 fichiers
+- ✅ 3 tables BDD
+
+**Expérience utilisateur :**
+- ✅ Design moderne
+- ✅ Responsive complet
+- ✅ Animations fluides
+- ✅ **Rester connecté 7 jours** 🆕
+
+---
+
+**FIN DE LA DOCUMENTATION COMPLÈTE**
+
+*Ce projet démontre la maîtrise de PHP, MySQL, JavaScript, l'architecture MVC, la sécurité web (incluant les cookies sécurisés), et l'intégration d'API REST.*
+
+**Projet 100% complet et professionnel ! 🎉📚🚀**
