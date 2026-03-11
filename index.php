@@ -7,10 +7,17 @@ require_once __DIR__ . '/header.php';
 <main>
     <section>
         <h2>Bienvenue sur mon site web!</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime recusandae, enim voluptate ea optio iusto incidunt. Vel vero accusamus eligendi ab dolores, in doloremque, eveniet ipsa numquam eaque suscipit minus?</p>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi quis eligendi omnis atque quaerat. Nam aliquid in ex libero tempora rem optio amet ipsa, quia suscipit distinctio, accusamus repellendus quisquam.</p>
-        <p>Explorez les différentes sections du site, ou contactez-moi pour plus d’informations.</p>
-    </section>
+<p>
+Ce site est une librairie personnelle qui me permet de gérer et organiser les livres que je souhaite conserver dans ma collection. Les livres peuvent être ajoutés automatiquement grâce à l’import depuis l’API Google Books ou créés manuellement lorsque les informations ne sont pas disponibles.
+</p>
+
+<p>
+Chaque livre peut ensuite être évalué grâce à un système de notation allant de 1 à 5 étoiles. Il est également possible d’ajouter un commentaire afin de garder une trace de mes impressions, de rédiger un avis personnel ou simplement de noter ce qui m’a marqué pendant la lecture.
+</p>
+
+<p>
+Explorez la bibliothèque pour découvrir les livres enregistrés, leurs notes et leurs commentaires.
+</p>    </section>
 </main>
 
 <?php require_once __DIR__ . '/footer.php'; ?>
