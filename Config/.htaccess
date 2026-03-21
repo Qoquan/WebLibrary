@@ -1,0 +1,32 @@
+# =========================================================
+# FICHIER : .htaccess (DOSSIER CONFIG)
+# Emplacement : C:\laragon\www\webdynamique\config\.htaccess
+# =========================================================
+
+# ========================================
+# BLOQUER TOUT ACCÈS DIRECT
+# ========================================
+
+# Interdire l'accès à TOUS les fichiers de ce dossier
+<Files "*">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Message si quelqu'un essaye d'accéder
+ErrorDocument 403 "Accès interdit"
+
+# ========================================
+# ALTERNATIVE : Bloquer fichiers spécifiques
+# ========================================
+
+# Si vous préférez bloquer fichier par fichier :
+# <Files "config.php">
+#     Order Allow,Deny
+#     Deny from all
+# </Files>
+# 
+# <Files "config_mail.php">
+#     Order Allow,Deny
+#     Deny from all
+# </Files>

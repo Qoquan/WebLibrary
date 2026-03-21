@@ -1,0 +1,121 @@
+# =========================================================
+# FICHIER : .htaccess (RACINE DU PROJET)
+# Emplacement : C:\laragon\www\webdynamique\.htaccess
+# =========================================================
+
+# ========================================
+# PROTECTION GÉNÉRALE
+# ========================================
+
+# Désactiver l'affichage des fichiers
+Options -Indexes
+
+# Masquer la version d'Apache
+ServerSignature Off
+
+# ========================================
+# SÉCURITÉ
+# ========================================
+
+# Bloquer l'accès aux fichiers sensibles
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Bloquer l'accès aux fichiers de configuration
+<FilesMatch "\.(ini|log|conf|bak|sql)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# ========================================
+# PROTECTION XSS ET CLICKJACKING
+# ========================================
+
+# Protection XSS
+<IfModule mod_headers.c>
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ========================================
+# PERFORMANCES
+# ========================================
+
+# Compression GZIP
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Cache navigateur
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Images
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    
+    # CSS et JavaScript
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+    
+    # Fonts
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/ttf "access plus 1 year"
+    
+    # HTML
+    ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# ========================================
+# ERREURS PERSONNALISÉES (optionnel)
+# ========================================
+
+# ErrorDocument 404 /404.php
+# ErrorDocument 403 /403.php
+# ErrorDocument 500 /500.php
+
+# ========================================
+# REDIRECTION HTTPS (à activer en production)
+# ========================================
+
+# Décommenter ces lignes en production avec HTTPS
+# <IfModule mod_rewrite.c>
+#     RewriteEngine On
+#     RewriteCond %{HTTPS} off
+#     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
+
+# ========================================
+# URL REWRITING (optionnel - URLs propres)
+# ========================================
+
+# Décommenter pour activer les URLs propres
+# <IfModule mod_rewrite.c>
+#     RewriteEngine On
+#     RewriteBase /webdynamique/
+#     
+#     # Rediriger index.html vers index.php
+#     RewriteCond %{REQUEST_FILENAME} !-f
+#     RewriteCond %{REQUEST_FILENAME} !-d
+#     RewriteRule ^(.*)\.html$ $1.php [L,R=301]
+# </IfModule>
+
+# ========================================
+# LIMITE DE TÉLÉCHARGEMENT
+# ========================================
+
+# Limite de taille des fichiers uploadés (si vous ajoutez cette fonctionnalité)
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+php_value max_execution_time 300
+php_value max_input_time 300

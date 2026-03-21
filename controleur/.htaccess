@@ -1,0 +1,32 @@
+# =========================================================
+# FICHIER : .htaccess (DOSSIER CONTROLEUR)
+# Emplacement : C:\laragon\www\webdynamique\controleur\.htaccess
+# =========================================================
+
+# ========================================
+# BLOQUER ACCÈS DIRECT AUX CONTRÔLEURS
+# ========================================
+
+# Les contrôleurs doivent être appelés via require_once, 
+# PAS directement via URL
+
+<Files "*.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Message si quelqu'un essaye d'accéder
+ErrorDocument 403 "Accès direct aux contrôleurs interdit"
+
+# ========================================
+# EXPLICATION
+# ========================================
+
+# Sans ce fichier :
+# ✅ Quelqu'un peut aller sur :
+#    http://localhost/webdynamique/controleur/connexion_controleur.php
+#
+# Avec ce fichier :
+# ❌ Accès bloqué avec erreur 403 Forbidden
+#
+# Les contrôleurs fonctionnent toujours normalement via require_once !
