@@ -26,6 +26,7 @@
                     if (est_connecte()): ?>
                         <li><a href="/recherche.php" class="<?php echo ($pageTitle === 'Rechercher des livres') ? 'active' : ''; ?>">🔍 Rechercher</a></li>
                         <li><a href="/bibliotheque.php" class="<?php echo ($pageTitle === 'Bibliothèque') ? 'active' : ''; ?>">📚 Bibliothèque</a></li>
+                        <li><a href="/statistiques.php"class="<?php echo ($pageTitle === 'Statistiques') ? 'active' : ''; ?>">📊 Statistiques</a></li>
                         <li><a href="/profil.php" class="<?php echo ($pageTitle === 'Mon Profil') ? 'active' : ''; ?>">👤 Profil</a></li>
                         <li><a href="/deconnexion.php" class="btn-deconnexion">🚪 Déconnexion</a></li>
                     <?php else: ?>
